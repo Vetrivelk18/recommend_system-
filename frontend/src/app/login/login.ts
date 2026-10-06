@@ -19,6 +19,10 @@ export class Login {
   readonly busy = signal(false);
   readonly error = signal('');
 
+  /** Set when the auth interceptor sent us here after a 401, so the redirect is explained
+   *  rather than just happening. Tokens last two hours and there is no refresh. */
+  readonly expired = signal(new URLSearchParams(location.search).has('expired'));
+
   submit() {
     this.error.set('');
     if (!this.mobile.trim() || !this.password) {

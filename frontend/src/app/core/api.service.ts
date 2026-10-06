@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpInterceptorFn } from '@angular/common/http';
-import { forkJoin, map, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, forkJoin, map, tap, throwError } from 'rxjs';
 import {
   AuthResponse, CartView, DashboardResponse, OnboardingOptions, OrderDetail,
   OrderSummary, Option, OrganicOption, SearchResult, SignupRequest
@@ -154,9 +155,26 @@ export class ApiService {
  * independent. Requests to other origins are left alone.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
   const token = sessionStorage.getItem('token');
-  if (!token || !req.url.startsWith('/api/')) {
-    return next(req);
-  }
-  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+
+  const outgoing = token && req.url.startsWith('/api/')
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
+
+  return next(outgoing).pipe(
+    catchError(error => {
+      // 401 means the token is missing, expired or bad - the session is over, and with a
+      // 120-minute expiry and no refresh that is a normal end to a visit, not a fault.
+      // Without this the pages just render "(401)" and leave the user stranded.
+      //
+      // 403 is deliberately NOT handled here: the credentials are fine and the request was
+      // not, so signing the user out would hide a bug rather than fix anything.
+      if (error?.status === 401 && !req.url.includes('/api/auth/')) {
+        sessionStorage.clear();
+        router.navigate(['/login'], { queryParams: { expired: 1 } });
+      }
+      return throwError(() => error);
+    })
+  );
 };
