@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "Instacart Onboarding Flow",
+    "description": "Page 2 survey: run the five GETs to see the choices, set the pick variables, then Sign Up.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "DEPARTMENT", "value": "produce" },
+    { "key": "AISLE", "value": "fresh fruits" },
+    { "key": "DOW", "value": "Sunday" },
+    { "key": "HOUR", "value": "Morning" },
+    { "key": "ORGANIC", "value": "medium" },
+    { "key": "name", "value": "Test User" },
+    { "key": "password", "value": "secret123" }
+  ],
+  "item": [
+    {
+      "name": "1. GET departments",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/onboarding/departments", "host": ["{{baseUrl}}"], "path": ["api","onboarding","departments"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const list = pm.response.json();",
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "console.log('--- DEPARTMENTS (' + list.length + ') ---');",
+          "list.forEach(d => console.log('  ' + d.name));",
+          "console.log('Currently selected DEPARTMENT = ' + pm.collectionVariables.get('DEPARTMENT'));",
+          "console.log('To change: Collection > Variables > DEPARTMENT');"
+        ]}
+      }]
+    },
+    {
+      "name": "2. GET aisles",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/onboarding/aisles", "host": ["{{baseUrl}}"], "path": ["api","onboarding","aisles"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const list = pm.response.json();",
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "console.log('--- AISLES (' + list.length + ') --- first 20:');",
+          "list.slice(0,20).forEach(a => console.log('  ' + a.name));",
+          "console.log('Currently selected AISLE = ' + pm.collectionVariables.get('AISLE'));"
+        ]}
+      }]
+    },
+    {
+      "name": "3. GET days",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/onboarding/days", "host": ["{{baseUrl}}"], "path": ["api","onboarding","days"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "console.log('--- DAYS --- ' + pm.response.json().join(', '));",
+          "console.log('Currently selected DOW = ' + pm.collectionVariables.get('DOW'));"
+        ]}
+      }]
+    },
+    {
+      "name": "4. GET times",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/onboarding/times", "host": ["{{baseUrl}}"], "path": ["api","onboarding","times"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "console.log('--- TIMES --- ' + pm.response.json().join(', '));",
+          "console.log('Currently selected HOUR = ' + pm.collectionVariables.get('HOUR'));"
+        ]}
+      }]
+    },
+    {
+      "name": "5. GET organic",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/onboarding/organic", "host": ["{{baseUrl}}"], "path": ["api","onboarding","organic"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "const list = pm.response.json();",
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "console.log('--- ORGANIC ---');",
+          "list.forEach(o => console.log('  ' + o.value + '  =  ' + o.label));",
+          "console.log('Currently selected ORGANIC = ' + pm.collectionVariables.get('ORGANIC'));"
+        ]}
+      }]
+    },
+    {
+      "name": "6. POST signup (uses your picks)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"{{name}}\",\n  \"mobile\": \"{{mobile}}\",\n  \"password\": \"{{password}}\",\n  \"preferences\": {\n    \"DEPARTMENT\": \"{{DEPARTMENT}}\",\n    \"AISLE\": \"{{AISLE}}\",\n    \"DOW\": \"{{DOW}}\",\n    \"HOUR\": \"{{HOUR}}\",\n    \"ORGANIC\": \"{{ORGANIC}}\"\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api","auth","signup"] }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": [
+            "// unique mobile each run, so you never hit 409",
+            "pm.collectionVariables.set('mobile', '9' + String(Date.now()).slice(-9));",
+            "console.log('Signing up with:',",
+            "  pm.collectionVariables.get('DEPARTMENT'),'/',",
+            "  pm.collectionVariables.get('AISLE'),'/',",
+            "  pm.collectionVariables.get('DOW'),'/',",
+            "  pm.collectionVariables.get('HOUR'),'/',",
+            "  pm.collectionVariables.get('ORGANIC'));"
+          ]}
+        },
+        {
+          "listen": "test",
+          "script": { "exec": [
+            "pm.test('201 Created', () => pm.response.to.have.status(201));",
+            "const b = pm.response.json();",
+            "pm.test('got a token', () => pm.expect(b.token).to.be.a('string'));",
+            "pm.test('user_id is a new signup (>= 206210)', () => pm.expect(b.userId).to.be.at.least(206210));",
+            "pm.test('preferences echoed back', () => pm.expect(b.preferences).to.be.an('object'));",
+            "pm.collectionVariables.set('token', b.token);",
+            "pm.collectionVariables.set('userId', b.userId);",
+            "console.log('Created user ' + b.userId + ' -> ' + JSON.stringify(b.preferences));"
+          ]}
+        }
+      ]
+    },
+    {
+      "name": "7. POST login (as the user just created)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mobile\": \"{{mobile}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('200 OK', () => pm.response.to.have.status(200));",
+          "const b = pm.response.json();",
+          "pm.test('same user as signup', () => pm.expect(b.userId).to.eql(Number(pm.collectionVariables.get('userId'))));",
+          "pm.test('preferences survived the round trip', () => pm.expect(b.preferences).to.be.an('object'));",
+          "console.log('Logged in as ' + b.name + ' -> ' + JSON.stringify(b.preferences));"
+        ]}
+      }]
+    }
+  ]
+}

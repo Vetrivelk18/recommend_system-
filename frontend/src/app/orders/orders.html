@@ -1,0 +1,71 @@
+<header class="bar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">▲</span>
+    <span class="name">Basket</span>
+  </div>
+
+  <div class="bar-right">
+    @if (userId !== null) {
+      <span class="who">user <span class="uid">{{ userId }}</span></span>
+    }
+    <app-theme-toggle />
+    <button class="ghost" routerLink="/cart">Cart</button>
+    <button class="ghost" (click)="back()">Dashboard</button>
+  </div>
+</header>
+
+<main class="page">
+  <h2>Your orders</h2>
+
+  @if (justPlaced(); as id) {
+    <p class="notice ok">Order #{{ id }} placed. Your dashboard rails have been updated.</p>
+  }
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  } @else if (orders(); as list) {
+    @if (list.length) {
+      <ul class="grid orders">
+        @for (o of list; track o.orderId) {
+          <li class="order">
+            <button class="row" (click)="toggle(o.orderId)" [attr.aria-expanded]="open() === o.orderId">
+              <span class="oid">#{{ o.orderId }}</span>
+              <span class="meta">
+                <span class="date">{{ when(o.placedAt) }}</span>
+                <span class="sub">
+                  {{ o.lineCount }} {{ o.lineCount === 1 ? 'product' : 'products' }} ·
+                  {{ o.totalQuantity }} {{ o.totalQuantity === 1 ? 'unit' : 'units' }}
+                </span>
+              </span>
+              <span class="status">{{ o.status }}</span>
+              <span class="chev" aria-hidden="true">{{ open() === o.orderId ? '▴' : '▾' }}</span>
+            </button>
+
+            @if (open() === o.orderId) {
+              @if (detailLoading()) {
+                <p class="sub pad">Loading…</p>
+              } @else if (detail(); as d) {
+                <ul class="items">
+                  @for (line of d.lines; track line.productId) {
+                    <li>
+                      <span class="nm">{{ line.product }}</span>
+                      <span class="n">× {{ line.quantity }}</span>
+                    </li>
+                  }
+                </ul>
+                <p class="sub pad">
+                  Names are as they were when the order was placed.
+                </p>
+              }
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="empty">
+        <p class="empty-title">No orders yet</p>
+        <p class="sub">Place one from your <a routerLink="/cart">cart</a>.</p>
+      </div>
+    }
+  }
+</main>

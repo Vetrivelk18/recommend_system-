@@ -1,0 +1,42 @@
+<div class="shell">
+  <main class="card">
+    <div class="card-top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">▲</span>
+        <span class="name">Basket</span>
+      </div>
+      <app-theme-toggle />
+    </div>
+
+    <h1>Welcome back</h1>
+    <p class="sub">Sign in with the mobile number you registered.</p>
+
+    <form (ngSubmit)="submit()">
+      <div class="field">
+        <label for="mobile">Mobile</label>
+        <input id="mobile" name="mobile" type="tel" inputmode="numeric"
+               autocomplete="tel" enterkeyhint="next" placeholder="9150146944"
+               [(ngModel)]="mobile" [disabled]="busy()">
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password"
+               autocomplete="current-password" enterkeyhint="go" placeholder="••••••••"
+               [(ngModel)]="password" [disabled]="busy()">
+      </div>
+
+      <div class="actions">
+        <button type="submit" [disabled]="busy()">
+          {{ busy() ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </div>
+    </form>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <p class="alt">No account? <a routerLink="/signup">Create one</a></p>
+  </main>
+</div>

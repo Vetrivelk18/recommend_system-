@@ -1,0 +1,119 @@
+<div class="shell">
+  <main class="card">
+    <div class="card-top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">▲</span>
+        <span class="name">Basket</span>
+      </div>
+      <app-theme-toggle />
+    </div>
+
+    <div class="steps" aria-hidden="true">
+      <span class="on"></span>
+      <span [class.on]="step() === 2"></span>
+    </div>
+
+    @if (step() === 1) {
+      <h1>Create your account</h1>
+      <p class="sub">Step 1 of 2 · nothing is sent yet</p>
+
+      <form (ngSubmit)="next()">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" autocomplete="name" enterkeyhint="next"
+                 [(ngModel)]="name">
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="mobile">Mobile</label>
+            <input id="mobile" name="mobile" type="tel" inputmode="numeric"
+                   autocomplete="tel" enterkeyhint="next" [(ngModel)]="mobile">
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password"
+                   autocomplete="new-password" enterkeyhint="go" [(ngModel)]="password">
+            <p class="hint">At least 8 characters.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit">Next</button>
+        </div>
+      </form>
+
+      <p class="alt">Already registered? <a routerLink="/login">Sign in</a></p>
+
+    } @else {
+      <h1>How do you shop?</h1>
+      <p class="sub">Step 2 of 2 · this is what we recommend from until you've ordered</p>
+
+      @if (options(); as o) {
+        <form (ngSubmit)="submit()">
+          <div class="grid-2">
+            <div class="field">
+              <label for="department">Department</label>
+              <select id="department" name="department" [(ngModel)]="department">
+                @for (d of o.departments; track d.id) {
+                  <option [value]="d.name">{{ d.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="aisle">Aisle</label>
+              <input name="aisleFilter" placeholder="Filter 134 aisles…"
+                     [ngModel]="aisleFilter()" (ngModelChange)="onAisleFilter($event)"
+                     style="margin-bottom:.4rem">
+              <select id="aisle" name="aisle" [(ngModel)]="aisle" size="1">
+                @for (a of visibleAisles(); track a.id) {
+                  <option [value]="a.name">{{ a.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="dow">Day you usually shop</label>
+              <select id="dow" name="dow" [(ngModel)]="dow">
+                @for (d of o.days; track d) { <option [value]="d">{{ d }}</option> }
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="hour">Time you usually shop</label>
+              <select id="hour" name="hour" [(ngModel)]="hour">
+                @for (t of o.times; track t) { <option [value]="t">{{ t }}</option> }
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="organic">How much of your shopping is organic?</label>
+            <select id="organic" name="organic" [(ngModel)]="organic">
+              @for (g of o.organic; track g.value) {
+                <option [value]="g.value">{{ g.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="actions">
+            <button type="submit" [disabled]="busy()">
+              {{ busy() ? 'Creating…' : 'Create account' }}
+            </button>
+            <button type="button" class="ghost" (click)="back()" [disabled]="busy()">
+              Back
+            </button>
+          </div>
+        </form>
+      } @else if (!error()) {
+        <p class="sub">Loading the questions…</p>
+      }
+    }
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+  </main>
+</div>

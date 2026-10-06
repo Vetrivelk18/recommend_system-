@@ -1,0 +1,136 @@
+:host { display: block; }
+
+/* Sticky so sign-out stays reachable while scrolling on a phone */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem var(--gap);
+  padding-top: max(0.7rem, env(safe-area-inset-top));
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.bar-right { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+
+.who {
+  font-weight: 600;
+  font-size: var(--step--1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.who .uid { color: var(--muted); font-weight: 400; }
+
+button.signout { width: auto; min-height: 40px; padding: 0 0.85rem; font-size: var(--step--1); }
+
+/* Four buttons now share this row (Search, Cart, Orders, Sign out), and the global rule
+   sizes every button at width:100%. Previously flex-shrink hid that; with one more button
+   the labels began wrapping mid-word. Sizing them to their text fixes the cause - do NOT
+   add flex:none here, which pins them at 100% and pushes the row off-screen. The name is
+   what gives way when space is genuinely short. */
+.bar-right button { width: auto; white-space: nowrap; }
+.who { overflow: hidden; text-overflow: ellipsis; }
+
+/* Below 26rem the name is the first thing to go - the buttons matter more */
+@media (max-width: 26rem) {
+  .who { display: none; }
+  .brand .name { display: none; }
+}
+
+.page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--gap);
+  padding-bottom: max(var(--gap), env(safe-area-inset-bottom));
+}
+
+section + section { margin-top: 2rem; }
+h2 { margin-bottom: 0.15rem; }
+
+.grid {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+  /* min() keeps a single column from overflowing a 320px screen */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition: border-color .15s ease, transform .1s ease;
+}
+.item:hover { border-color: var(--line-2); transform: translateY(-1px); }
+
+.badge {
+  flex: none;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  font-size: 0.9rem; font-weight: 700;
+  color: #fff;
+  border-radius: 9px;
+  text-transform: uppercase;
+}
+
+.nm { font-size: var(--step-0); line-height: 1.35; min-width: 0; }
+
+.empty {
+  margin-top: 0.85rem;
+  padding: 1.5rem;
+  background: var(--surface-2);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.empty-title { margin: 0 0 0.2rem; font-weight: 600; }
+.empty .sub { margin: 0; }
+
+/* Skeleton sizes mirror the real elements so nothing jumps on load */
+.sk-h2   { height: 1.5rem; width: 12rem; margin-bottom: 0.5rem; }
+.sk-sub  { height: 0.9rem; width: 18rem; max-width: 80%; }
+.sk-card { height: 66px; border-radius: var(--radius-sm); }
+
+.reco-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.reco-head h2 { margin-bottom: 0; }
+
+.timing {
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+}
+
+/* Accent on accent-soft, never accent-ink: ink is sized for the solid accent and
+   would land white-on-pale in light mode, near-black-on-near-black in dark. */
+.timing.warm {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.count {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  font-size: var(--step--2);
+  font-variant-numeric: tabular-nums;
+}

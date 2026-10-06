@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl *)",
+      "Bash(nc -z localhost 6379)",
+      "Bash(pkill -f \"spring-boot:run\")",
+      "Bash(pkill -f \"com.example.demo.DemoApplication\")",
+      "Bash(./mvnw *)",
+      "Bash(python3 -VV)",
+      "Bash(python3 -m pip --version)"
+    ]
+  }
+}

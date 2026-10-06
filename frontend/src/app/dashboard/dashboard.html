@@ -1,0 +1,134 @@
+<header class="bar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">▲</span>
+    <span class="name">Basket</span>
+  </div>
+
+  <div class="bar-right">
+    @if (data(); as d) {
+      <span class="who">{{ d.name }}<span class="uid"> · {{ d.userId }}</span></span>
+    }
+    <app-theme-toggle />
+    <button class="ghost" routerLink="/search">Search</button>
+    <button class="ghost" routerLink="/cart">
+      Cart@if (cartCount() > 0) { <span class="count">{{ cartCount() }}</span> }
+    </button>
+    <button class="ghost" routerLink="/orders">Orders</button>
+    <button class="ghost signout" (click)="signOut()">Sign out</button>
+  </div>
+</header>
+
+<main class="page">
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  } @else if (data(); as d) {
+
+    <section>
+      <h2>{{ d.forYou.length ? d.forYouTitle : 'Buy it again' }}</h2>
+      @if (d.forYou.length) {
+        <p class="sub">Your most-bought items, most frequent first.</p>
+        <ul class="grid">
+          @for (p of d.forYou; track p) {
+            <li class="item">
+              <span class="badge" [style.background]="tint(p)">{{ p.charAt(0) }}</span>
+              <span class="nm">{{ p }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty">
+          <p class="empty-title">No order history yet</p>
+          <p class="sub">Once you've placed an order, your regulars show up here.</p>
+        </div>
+      }
+    </section>
+
+    <section>
+      <h2>Running low</h2>
+      @if (d.runningLow.length) {
+        <p class="sub">Overdue against how often you usually rebuy them.</p>
+        <ul class="grid">
+          @for (p of d.runningLow; track p) {
+            <li class="item">
+              <span class="badge" [style.background]="tint(p)">{{ p.charAt(0) }}</span>
+              <span class="nm">{{ p }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty">
+          <p class="empty-title">Nothing due right now</p>
+          <p class="sub">Items appear here once they are past their usual repurchase point.</p>
+        </div>
+      }
+    </section>
+
+    <section>
+      <div class="reco-head">
+        <h2>Recommended for you</h2>
+        <button class="ghost" (click)="loadRecommendations()" [disabled]="recosLoading()">
+          {{ recosLoading() ? 'Loading…' : (recos() ? 'Reload' : 'Load') }}
+        </button>
+        @if (recosMs() !== null && !recosLoading()) {
+          <span class="timing" [class.warm]="recosMs()! < 2000">{{ recosMs() }} ms</span>
+        }
+      </div>
+      <p class="sub">The same picks the follow-up message would send, cached for 30 minutes.</p>
+
+      @if (recosError()) {
+        <p class="error" role="alert">{{ recosError() }}</p>
+      } @else if (recosLoading()) {
+        <p class="sub">A cold read reruns the reranker and can take up to a minute.</p>
+        <ul class="grid">
+          @for (i of placeholders; track i) { <li class="skeleton sk-card"></li> }
+        </ul>
+      } @else if (recos(); as r) {
+        @if (r.length) {
+          <ul class="grid">
+            @for (p of r; track p) {
+              <li class="item">
+                <span class="badge" [style.background]="tint(p)">{{ p.charAt(0) }}</span>
+                <span class="nm">{{ p }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="empty">
+            <p class="empty-title">Nothing to recommend yet</p>
+            <p class="sub">These are built from order history, so they appear once you have some.</p>
+          </div>
+        }
+      }
+    </section>
+
+    <section>
+      <h2>Popular right now</h2>
+      <p class="sub">Most distinct buyers across the whole catalogue.</p>
+      <ul class="grid">
+        @for (p of d.popular; track p) {
+          <li class="item">
+            <span class="badge" [style.background]="tint(p)">{{ p.charAt(0) }}</span>
+            <span class="nm">{{ p }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+  } @else {
+    <!-- ~1.4s against Supabase in Tokyo; a bare "Loading…" reads as broken -->
+    <section>
+      <div class="skeleton sk-h2"></div>
+      <div class="skeleton sk-sub"></div>
+      <ul class="grid">
+        @for (i of placeholders; track i) { <li class="skeleton sk-card"></li> }
+      </ul>
+    </section>
+    <section>
+      <div class="skeleton sk-h2"></div>
+      <div class="skeleton sk-sub"></div>
+      <ul class="grid">
+        @for (i of placeholders; track i) { <li class="skeleton sk-card"></li> }
+      </ul>
+    </section>
+  }
+</main>

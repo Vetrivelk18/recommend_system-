@@ -1,0 +1,683 @@
+<title>Basket Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --surface-3: #e6e9ee;
+    --ink: #12161b;
+    --ink-2: #3d4652;
+    --muted: #6b7580;
+    --line: #e0e4ea;
+    --line-2: #cfd5de;
+    --accent: #1f7a4d;
+    --accent-soft: #e8f3ec;
+    --crit: #b42318;
+    --crit-bg: #fdf2f1;
+    --warn: #8a5a00;
+    --warn-bg: #fcf4de;
+
+    --display: 'Bricolage Grotesque', 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    --body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --step--1: clamp(0.78rem, 0.75rem + 0.16vw, 0.87rem);
+    --step-0: clamp(0.94rem, 0.91rem + 0.18vw, 1.02rem);
+    --step-1: clamp(1.12rem, 1.03rem + 0.42vw, 1.36rem);
+    --step-2: clamp(1.45rem, 1.24rem + 0.95vw, 2.05rem);
+    --step-3: clamp(2rem, 1.5rem + 2.2vw, 3.1rem);
+
+    --radius: 14px;
+    --radius-sm: 10px;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #1c2229;
+      --surface-3: #262d36;
+      --ink: #e8edf3;
+      --ink-2: #b6c0cc;
+      --muted: #8b95a1;
+      --line: #262d36;
+      --line-2: #333b45;
+      --accent: #3fa46b;
+      --accent-soft: #14261c;
+      --crit: #ff9b91;
+      --crit-bg: #2b1a19;
+      --warn: #e3b341;
+      --warn-bg: #2a2211;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c2229;
+    --surface-3: #262d36;
+    --ink: #e8edf3;
+    --ink-2: #b6c0cc;
+    --muted: #8b95a1;
+    --line: #262d36;
+    --line-2: #333b45;
+    --accent: #3fa46b;
+    --accent-soft: #14261c;
+    --crit: #ff9b91;
+    --crit-bg: #2b1a19;
+    --warn: #e3b341;
+    --warn-bg: #2a2211;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 var(--step-0)/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: clamp(2rem, 5vw, 3.75rem) 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.75rem, 6vw, 4.25rem);
+  }
+
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  h1 {
+    font: 700 var(--step-3)/1.05 var(--display);
+    letter-spacing: -0.025em;
+  }
+  h2 {
+    font: 600 var(--step-2)/1.15 var(--display);
+    letter-spacing: -0.015em;
+  }
+  h3 { font: 600 var(--step-1)/1.3 var(--body); }
+  p { margin: 0; max-width: 65ch; }
+  code {
+    font: 500 0.9em var(--mono);
+    background: var(--surface-3);
+    padding: 0.08em 0.35em;
+    border-radius: 5px;
+  }
+
+  .eyebrow {
+    font: 500 var(--step--1)/1.4 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  section { display: flex; flex-direction: column; gap: 1.1rem; }
+  .intro { color: var(--ink-2); }
+
+  /* ── Masthead ── */
+  .mast { display: flex; flex-direction: column; gap: 1.25rem; }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .brand-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font: 600 var(--step-0)/1 var(--body);
+  }
+  .mark { color: var(--accent); font-size: 0.95em; }
+  .lead { font-size: var(--step-1); line-height: 1.5; color: var(--ink-2); }
+
+  .stats {
+    margin: 0.5rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-block: 1px solid var(--line-2);
+  }
+  .stats div {
+    padding: 1rem 1rem 1.05rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .stats dt { font-size: var(--step--1); color: var(--muted); order: 2; }
+  .stats dd {
+    margin: 0;
+    font: 600 var(--step-2)/1.1 var(--display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    order: 1;
+  }
+  .stats dd.good { color: var(--accent); }
+  @media (min-width: 640px) {
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .stats div + div { padding-left: 1rem; border-left: 1px solid var(--line); }
+  }
+  @media (max-width: 639px) {
+    .stats div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .stats div:nth-child(even) { padding-left: 1rem; border-left: 1px solid var(--line); }
+  }
+
+  /* ── Diagram ── */
+  figure { margin: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(12px, 2vw, 20px);
+    overflow-x: auto;
+  }
+  .diagram svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  figcaption { font-size: var(--step--1); color: var(--muted); max-width: 65ch; }
+  .key-dot {
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 3px;
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    vertical-align: -0.05em;
+    margin-right: 0.25em;
+  }
+
+  .d-box { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1; }
+  .d-frame { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1; }
+  .d-row { fill: var(--surface); stroke: var(--line-2); stroke-width: 1; }
+  .d-hl { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  .d-t { fill: var(--ink); font: 600 13px var(--body); }
+  .d-t-hl { fill: var(--accent); font: 600 13px var(--body); }
+  .d-s { fill: var(--muted); font: 400 11px var(--mono); }
+  .d-l { fill: var(--ink-2); font: 500 11px var(--mono); }
+  .d-l-hl { fill: var(--accent); font: 500 11px var(--mono); }
+  .d-edge { stroke: var(--ink-2); stroke-width: 1.5; fill: none; }
+  .d-edge-hl { stroke: var(--accent); stroke-width: 2; fill: none; }
+  .d-head { fill: var(--ink-2); }
+  .d-head-hl { fill: var(--accent); }
+
+  /* ── Timeline ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 2px solid var(--line-2);
+    background: var(--bg);
+    flex: none;
+  }
+  .dot.recent { border-color: var(--accent); background: var(--accent); }
+
+  .timeline { list-style: none; margin: 0.4rem 0 0; padding: 0; display: flex; flex-direction: column; }
+  .entry {
+    display: grid;
+    grid-template-columns: 6.25rem 1fr;
+    gap: 0 1.5rem;
+  }
+  .when {
+    padding-top: 0.2rem;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .date {
+    font: 500 var(--step-0)/1.3 var(--mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .source { font-size: var(--step--1); color: var(--muted); line-height: 1.3; }
+  .what {
+    position: relative;
+    border-left: 2px solid var(--line);
+    padding: 0 0 2.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .entry:last-child .what { padding-bottom: 0; }
+  .what .dot { position: absolute; left: -7px; top: 0.45rem; }
+  .tag {
+    align-self: flex-start;
+    font: 500 0.72rem/1 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-2);
+    background: var(--surface-3);
+    padding: 0.32rem 0.5rem;
+    border-radius: 6px;
+  }
+  .what ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; color: var(--ink-2); }
+  .what li { max-width: 62ch; }
+  .what li::marker { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  @media (max-width: 560px) {
+    .entry { grid-template-columns: 1fr; }
+    .when { text-align: left; flex-direction: row; align-items: baseline; gap: 0.6rem; padding: 0 0 0.5rem 1.5rem; border-left: 2px solid var(--line); }
+    .what { padding-top: 0; }
+    .what .dot { top: -1.75rem; }
+  }
+
+  /* ── Tables ── */
+  .table-wrap {
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+  th, td { padding: 0.7rem 1rem; text-align: left; vertical-align: top; }
+  thead th {
+    font: 500 0.72rem/1.3 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line-2);
+    white-space: nowrap;
+  }
+  tbody tr + tr td { border-top: 1px solid var(--line); }
+  td.n {
+    font: 500 var(--step--1) var(--mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td.after { color: var(--accent); font-weight: 600; }
+  td.bad { color: var(--crit); }
+  .sub-h { margin-top: 0.75rem; }
+
+  /* ── Decisions ── */
+  .decisions { margin: 0; display: flex; flex-direction: column; gap: 1.1rem; }
+  .decisions div { display: grid; grid-template-columns: minmax(0, 15rem) 1fr; gap: 0.25rem 1.5rem; }
+  .decisions dt { font-weight: 600; }
+  .decisions dd { margin: 0; color: var(--ink-2); max-width: 62ch; }
+  @media (max-width: 640px) { .decisions div { grid-template-columns: 1fr; } }
+
+  /* ── Open items ── */
+  .groups { display: flex; flex-direction: column; gap: 1.6rem; }
+  .group { display: flex; flex-direction: column; gap: 0.7rem; }
+  .group-head { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+  .group-head p { color: var(--muted); font-size: var(--step--1); }
+  .chip {
+    font: 600 0.78rem/1 var(--body);
+    padding: 0.38rem 0.6rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .chip.crit { color: var(--crit); background: var(--crit-bg); }
+  .chip.warn { color: var(--warn); background: var(--warn-bg); }
+  .chip.later { color: var(--ink-2); background: var(--surface-3); }
+  .items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .items li {
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    max-width: 68ch;
+  }
+  .items li:last-child { border-bottom: 1px solid var(--line); }
+  .items strong { color: var(--ink); font-weight: 600; }
+  .note { font-size: var(--step--1); color: var(--muted); }
+
+  footer {
+    border-top: 1px solid var(--line-2);
+    padding-top: 1.25rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="brand">
+      <span class="brand-name"><span class="mark" aria-hidden="true">▲</span>Basket</span>
+      <span class="eyebrow">Aug 29 – Sep 14, 2026</span>
+    </div>
+    <h1>Basket build log</h1>
+    <p class="lead">Seventeen days of building a grocery recommender on the Instacart catalogue: from an empty Spring Boot project to search, personalised picks, text messages and caching. What shipped, what we measured, and what's still open.</p>
+    <dl class="stats">
+      <div><dt>days, first file to today</dt><dd>17</dd></div>
+      <div><dt>products embedded for search</dt><dd>49,688</dd></div>
+      <div><dt>recommendations, cached vs cold</dt><dd class="good">0.23 s</dd></div>
+      <div><dt>open items, 3 urgent</dt><dd>12</dd></div>
+    </dl>
+  </header>
+
+  <main class="wrap" style="padding:0;max-width:none;">
+
+    <section aria-labelledby="h-system">
+      <h2 id="h-system">How it fits together</h2>
+      <p class="intro">A shopper uses the Angular app; everything else happens behind the Spring Boot service. Two local AI pieces do the heavy lifting: a small embedding model turns search text into vectors, and a 14-billion-parameter model picks each shopper's final five products.</p>
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 800 430" role="img" aria-label="Architecture: the Angular app calls Spring Boot over HTTP. Spring Boot's search, recommendations and webhook job read and write two caches in Upstash Redis, call a Python embedding service, rerank with Ollama, send picks through an SMS sender, and query Supabase Postgres with pgvector.">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="d-head" fill="#3d4652"></path>
+              </marker>
+              <marker id="ah-hl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="d-head-hl" fill="#1f7a4d"></path>
+              </marker>
+            </defs>
+
+            <!-- Angular app -->
+            <rect x="16" y="54" width="128" height="64" rx="10" class="d-box" fill="#f0f2f5"></rect>
+            <text x="80" y="82" text-anchor="middle" class="d-t">Angular app</text>
+            <text x="80" y="100" text-anchor="middle" class="d-s">search · recs</text>
+
+            <line x1="144" y1="86" x2="220" y2="86" class="d-edge" marker-end="url(#ah)"></line>
+            <text x="182" y="77" text-anchor="middle" class="d-l">HTTP /api</text>
+
+            <!-- Redis (new this week) -->
+            <rect x="16" y="150" width="128" height="78" rx="10" class="d-hl" fill="#e8f3ec"></rect>
+            <text x="80" y="176" text-anchor="middle" class="d-t-hl">Upstash Redis</text>
+            <text x="80" y="196" text-anchor="middle" class="d-s">search:q · 10m</text>
+            <text x="80" y="213" text-anchor="middle" class="d-s">reco:user · 30m</text>
+
+            <line x1="226" y1="189" x2="150" y2="189" class="d-edge-hl" marker-end="url(#ah-hl)"></line>
+            <text x="188" y="180" text-anchor="middle" class="d-l-hl">get · set</text>
+
+            <!-- Spring Boot -->
+            <rect x="226" y="24" width="250" height="304" rx="12" class="d-frame" fill="#f0f2f5"></rect>
+            <text x="242" y="48" class="d-t">Spring Boot</text>
+            <text x="460" y="48" text-anchor="end" class="d-s">Java · :8080</text>
+
+            <rect x="242" y="62" width="218" height="48" rx="8" class="d-row" fill="#ffffff"></rect>
+            <text x="258" y="82" class="d-t">Search</text>
+            <text x="258" y="99" class="d-s">RRF · text + keyword</text>
+
+            <rect x="242" y="126" width="218" height="48" rx="8" class="d-row" fill="#ffffff"></rect>
+            <text x="258" y="146" class="d-t">Recommendations</text>
+            <text x="258" y="163" class="d-s">pre-warm · one rerank</text>
+
+            <rect x="242" y="190" width="218" height="48" rx="8" class="d-row" fill="#ffffff"></rect>
+            <text x="258" y="210" class="d-t">Webhook job</text>
+            <text x="258" y="227" class="d-s">polls every 60s</text>
+
+            <rect x="242" y="254" width="218" height="48" rx="8" class="d-row" fill="#ffffff"></rect>
+            <text x="258" y="274" class="d-t">Accounts &amp; dashboard</text>
+            <text x="258" y="291" class="d-s">JWT · onboarding · rails</text>
+
+            <!-- Right-hand services -->
+            <rect x="556" y="62" width="228" height="48" rx="10" class="d-box" fill="#f0f2f5"></rect>
+            <text x="572" y="82" class="d-t">Embed service</text>
+            <text x="572" y="99" class="d-s">Python · bge-small 384-d</text>
+            <line x1="460" y1="86" x2="552" y2="86" class="d-edge" marker-end="url(#ah)"></line>
+            <text x="506" y="77" text-anchor="middle" class="d-l">text→vec</text>
+
+            <rect x="556" y="126" width="228" height="48" rx="10" class="d-box" fill="#f0f2f5"></rect>
+            <text x="572" y="146" class="d-t">Ollama</text>
+            <text x="572" y="163" class="d-s">qwen2.5:14b · 9 GB</text>
+            <line x1="460" y1="150" x2="552" y2="150" class="d-edge" marker-end="url(#ah)"></line>
+            <text x="506" y="141" text-anchor="middle" class="d-l">100 → 5</text>
+
+            <rect x="556" y="190" width="228" height="48" rx="10" class="d-box" fill="#f0f2f5"></rect>
+            <text x="572" y="210" class="d-t">SMS sender</text>
+            <text x="572" y="227" class="d-s">stub · Twilio ready</text>
+            <line x1="460" y1="214" x2="552" y2="214" class="d-edge" marker-end="url(#ah)"></line>
+            <text x="506" y="205" text-anchor="middle" class="d-l">5 picks</text>
+
+            <!-- Postgres -->
+            <line x1="351" y1="328" x2="351" y2="364" class="d-edge" marker-end="url(#ah)"></line>
+            <text x="361" y="351" class="d-l">SQL · exact KNN</text>
+            <rect x="226" y="370" width="558" height="48" rx="10" class="d-box" fill="#f0f2f5"></rect>
+            <text x="505" y="390" text-anchor="middle" class="d-t">Supabase Postgres · pgvector</text>
+            <text x="505" y="407" text-anchor="middle" class="d-s">products · embeddings · last_search</text>
+          </svg>
+        </div>
+        <figcaption><span class="key-dot" aria-hidden="true"></span>Green marks what was added this week: two caches that let repeat searches and recommendations skip the embedding and rerank steps entirely.</figcaption>
+      </figure>
+    </section>
+
+    <section aria-labelledby="h-timeline">
+      <h2 id="h-timeline">Timeline</h2>
+      <div class="legend">
+        <span><span class="dot recent" aria-hidden="true"></span>Built this week (Sep 12–14)</span>
+        <span><span class="dot" aria-hidden="true"></span>Earlier work</span>
+      </div>
+
+      <ol class="timeline">
+        <li class="entry">
+          <div class="when"><span class="date">Aug 29</span><span class="source">from files</span></div>
+          <div class="what">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="tag">App</span>
+            <h3>Day one: the Spring Boot app</h3>
+            <ul>
+              <li>Signup and login with hashed passwords and JWT sessions.</li>
+              <li>Onboarding captures favourite departments and aisles, usual shopping day and time, and organic preference.</li>
+              <li>A dashboard with three five-item rails: <em>Buy it again</em>, <em>Running low</em> and <em>Popular right now</em>.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Aug 30</span><span class="source">files + notes</span></div>
+          <div class="what">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="tag">App · ML</span>
+            <h3>An Angular front end, and the model arrives</h3>
+            <ul>
+              <li>Angular login and signup pages, served straight from Spring.</li>
+              <li>A two-tower serving tool in <code>ml/</code>: the shopper's vector is computed on request, product vectors ahead of time.</li>
+              <li>Confirmed the shopper feature table is already normalised, so serving applies no transforms. Checked against the live database on Sep 1.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Aug 31</span><span class="source">from notes</span></div>
+          <div class="what">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="tag">ML</span>
+            <h3>Every product gets a text embedding</h3>
+            <ul>
+              <li><span class="num">49,688</span> products embedded as 384-dimension vectors with bge-small, in <span class="num">692 s</span> on the laptop.</li>
+              <li>Gemini's free tier was tried first and dropped: it counts every product against quota, which put the job at 8–9 hours.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Sep 1–3</span><span class="source">from notes</span></div>
+          <div class="what">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="tag">ML</span>
+            <h3>Search design, and a collapsed model fixed</h3>
+            <ul>
+              <li>Search blends meaning-based and keyword results with Reciprocal Rank Fusion. No vector index, by choice: exact search takes <span class="num">300–390 ms</span> and never misses a match.</li>
+              <li>The August recommendation model had collapsed: its product vectors had an effective rank of <span class="num">1.65</span> of 128, and picks were no better than chance.</li>
+              <li>Retrained on Sep 3 with temperature scaling and in-batch negatives: effective rank <span class="num">6.26</span>, and department matches <span class="num">4.09×</span> better than chance, up from <span class="num">1.40×</span>.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Sep 4–5</span><span class="source">files + notes</span></div>
+          <div class="what">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="tag">Pipeline</span>
+            <h3>The recommendation pipeline</h3>
+            <ul>
+              <li>A local Ollama model, qwen2.5:14b, picks the final five from about 100 candidates, discarding any product it invents. <span class="num">27.7–43.5 s</span> per shopper.</li>
+              <li>Candidates come from two sources: the shopper's last search, and products similar to what they usually buy.</li>
+              <li>Python precomputes shopper vectors and serves search-text embeddings; the Angular app gains a search page.</li>
+              <li>A background job prepares a follow-up text 15 minutes after a search. It logs the message instead of sending it.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Sep 12–13</span><span class="source">this week</span></div>
+          <div class="what">
+            <span class="dot recent" aria-hidden="true"></span>
+            <span class="tag">SMS</span>
+            <h3>Real text messages</h3>
+            <ul>
+              <li>A Twilio sender was added and tested with real messages to a verified phone.</li>
+              <li>Plain test messages arrived. Both product-list messages were reported <em>delivered</em> but never reached the phone.</li>
+              <li>Cause: under India's DLT rules, carriers silently drop promotional-looking texts from unregistered senders, after reporting delivery. The code works; delivery needs DLT registration on the Twilio account.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Sep 13</span><span class="source">this week</span></div>
+          <div class="what">
+            <span class="dot recent" aria-hidden="true"></span>
+            <span class="tag">Caching</span>
+            <h3>Redis caching</h3>
+            <ul>
+              <li>Each shopper's recommendations are cached for 30 minutes: <span class="num">52.8 s → 0.23 s</span> on a repeat read.</li>
+              <li>A new recommendations endpoint, and a <em>Recommended for you</em> section on the dashboard that shows how long each load took.</li>
+              <li>Search results are cached per query for 10 minutes and shared by every shopper: <span class="num">11.1 s → 0.38 s</span>.</li>
+              <li>Repeating the same search no longer throws away a shopper's recommendations.</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="entry">
+          <div class="when"><span class="date">Sep 14</span><span class="source">this week</span></div>
+          <div class="what">
+            <span class="dot recent" aria-hidden="true"></span>
+            <span class="tag">Hardening</span>
+            <h3>Making it hold up</h3>
+            <ul>
+              <li>Recommendations are now computed in the background right after a search: the first dashboard load dropped from about <span class="num">40 s</span> to <span class="num">0.62 s</span>.</li>
+              <li>Found and fixed a race where searching bread, then milk, cached bread recommendations for the milk search.</li>
+              <li>Tested a smaller model, qwen2.5:3b. Four times faster, but its picks were mostly unrelated to the search, so it was rejected.</li>
+              <li>Moved Redis from the laptop to Upstash. Cache reads stayed as fast: <span class="num">0.36 s</span>.</li>
+              <li>The database pool now keeps idle connections alive, fixing errors that appeared after the laptop slept.</li>
+              <li>Only one recommendation run happens per shopper and search; a second request waits for it instead of starting another.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="h-measured">
+      <h2 id="h-measured">What we measured</h2>
+      <p class="intro">Every figure below came from a real run against the live database, not an estimate.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Measurement</th><th scope="col">Before</th><th scope="col">After</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Products with text embeddings</td><td class="n">0</td><td class="n after">49,688</td></tr>
+            <tr><td>Recommendation model, effective rank of 128</td><td class="n">1.65</td><td class="n after">6.26</td></tr>
+            <tr><td>Department match vs chance</td><td class="n">1.40×</td><td class="n after">4.09×</td></tr>
+            <tr><td>Recommendations, repeat read</td><td class="n">52.8 s</td><td class="n after">0.23 s</td></tr>
+            <tr><td>Search, same query again</td><td class="n">11.1 s</td><td class="n after">0.38 s</td></tr>
+            <tr><td>First dashboard load after a search</td><td class="n">~40 s</td><td class="n after">0.62 s</td></tr>
+            <tr><td>Model runs when Load is clicked mid-computation</td><td class="n">2</td><td class="n after">1</td></tr>
+            <tr><td>Model runs for search bread → milk → Load</td><td class="n">3</td><td class="n after">2</td></tr>
+            <tr><td>Cache read, laptop Redis → Upstash</td><td class="n">0.38 s</td><td class="n after">0.36 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-h">Choosing the model</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Same shopper, same candidates</th><th scope="col">qwen2.5:14b</th><th scope="col">qwen2.5:3b</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Time to pick five, first run</td><td class="n">34.0 s</td><td class="n">8.0 s</td></tr>
+            <tr><td>Relevant picks after searching “milk”</td><td class="n after">5 of 5</td><td class="n bad">1 of 5, then 0 of 5</td></tr>
+            <tr><td>Memory while loaded</td><td class="n">9.0 GB</td><td class="n">1.9 GB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-decisions">
+      <h2 id="h-decisions">Decisions we stand by</h2>
+      <dl class="decisions">
+        <div>
+          <dt>Keep the 14B model</dt>
+          <dd>The 3B model is four times faster, but it recommended coffee and baby food to someone searching for milk. Background computation already removed the wait, so the speed buys nothing.</dd>
+        </div>
+        <div>
+          <dt>No vector index</dt>
+          <dd>At 49,688 products, exact search is 300–390 ms and never misses a match. Revisit only if traffic grows or the app moves next to the database.</dd>
+        </div>
+        <div>
+          <dt>“Delivered” isn't received</dt>
+          <dd>Indian carriers can drop a text after telling Twilio it was delivered. Confirm on a real phone before trusting the dashboard.</dd>
+        </div>
+        <div>
+          <dt>Caches fail quietly</dt>
+          <dd>If Redis is down or a password is wrong, the app keeps working, just slowly. Unexpected slowness is the symptom to investigate, starting with the logs.</dd>
+        </div>
+        <div>
+          <dt>Benchmark with varied inputs</dt>
+          <dd>Ollama reuses work from a repeated prompt, so the second identical request can look about seven times faster than a real one.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="h-open">
+      <h2 id="h-open">Still open</h2>
+      <div class="groups">
+        <div class="group">
+          <div class="group-head"><span class="chip crit">Fix soon</span><p>Risks to the project itself</p></div>
+          <ul class="items">
+            <li><strong>Credentials are exposed.</strong> The Redis password was shared in a working session and hasn't been rotated, and the database password sits in plain text in the app's config file.</li>
+            <li><strong>No version control.</strong> The project isn't in git, so none of these seventeen days can be reviewed or rolled back.</li>
+            <li><strong>No automated tests.</strong> Caching, the background computation and the duplicate-run fix were all verified by hand; the only test is the default one from day one.</li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <div class="group-head"><span class="chip warn">Watch</span><p>Works today, may bite</p></div>
+          <ul class="items">
+            <li><strong>Memory is tight.</strong> The 14B model holds 9 GB of the laptop's 16, and the app was killed for low memory twice on Sep 14.</li>
+            <li><strong>The sleep fix is unproven.</strong> The database keep-alive change can only be confirmed after the laptop next sleeps with the app running.</li>
+            <li><strong>Restarts log everyone out.</strong> The app has been started with a fresh random session key each time.</li>
+            <li><strong>Caching needs its settings.</strong> Starting the app without the Redis environment variables runs it with no caching at all.</li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <div class="group-head"><span class="chip later">Later</span><p>Product and model work</p></div>
+          <ul class="items">
+            <li><strong>Texts to Indian numbers</strong> need DLT registration of the sender and message template.</li>
+            <li><strong>A dashboard load right after a search</strong> still waits 50–60 s once, while the model finishes.</li>
+            <li><strong>Duplicate-run protection</strong> only works within a single running copy of the app.</li>
+            <li><strong>The product side of the model</strong> has no per-product embedding, and snacks and international foods were over-represented. <span class="note">From earlier notes, not re-checked.</span></li>
+            <li><strong>The balance between search and taste</strong> in recommendations was measured with a stand-in for real searches and hasn't been re-measured. <span class="note">From earlier notes.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Compiled Sep 14, 2026 from the project's files, notes from earlier working sessions, and this week's session log.</p>
+    <p>Aug 29 and Sep 5 are dated from file creation times and described from the code; there are no written notes for those days.</p>
+  </footer>
+
+</div>

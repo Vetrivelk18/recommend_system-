@@ -1,0 +1,73 @@
+<header class="bar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">▲</span>
+    <span class="name">Basket</span>
+  </div>
+
+  <div class="bar-right">
+    @if (userId !== null) {
+      <span class="who">user <span class="uid">{{ userId }}</span></span>
+    }
+    <app-theme-toggle />
+    <button class="ghost" routerLink="/search">Search</button>
+    <button class="ghost" (click)="back()">Dashboard</button>
+  </div>
+</header>
+
+<main class="page">
+  <h2>Your cart</h2>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (cart(); as c) {
+    @if (c.lines.length) {
+      <p class="sub">
+        {{ c.lineCount }} {{ c.lineCount === 1 ? 'product' : 'products' }},
+        {{ c.totalQuantity }} {{ c.totalQuantity === 1 ? 'unit' : 'units' }}.
+        No prices - this catalogue has none.
+      </p>
+
+      <ul class="grid lines">
+        @for (line of c.lines; track line.productId) {
+          <li class="item" [class.blocked]="isBlocked(line.product)" [class.gone]="!line.inStock">
+            <span class="badge" [style.background]="tint(line.product)">{{ line.product.charAt(0) }}</span>
+            <span class="nm">
+              {{ line.product }}
+              @if (!line.inStock) { <em class="flag">out of stock</em> }
+            </span>
+
+            <span class="qty">
+              <button class="step" (click)="step(line.productId, -1)"
+                      [disabled]="busy() !== null" aria-label="one fewer">−</button>
+              <span class="n">{{ line.quantity }}</span>
+              <button class="step" (click)="step(line.productId, 1)"
+                      [disabled]="busy() !== null || line.quantity >= 99 || !line.inStock"
+                      aria-label="one more">+</button>
+            </span>
+
+            <button class="ghost rm" (click)="remove(line.productId)" [disabled]="busy() !== null">
+              Remove
+            </button>
+          </li>
+        }
+      </ul>
+
+      <div class="checkout">
+        <button (click)="placeOrder()" [disabled]="placing()">
+          {{ placing() ? 'Placing…' : 'Place order' }}
+        </button>
+        <p class="sub">
+          Checkout records the order, advances your order count, and updates
+          Running Low and Buy It Again on the dashboard.
+        </p>
+      </div>
+    } @else {
+      <div class="empty">
+        <p class="empty-title">Your cart is empty</p>
+        <p class="sub">Add something from <a routerLink="/search">search</a>.</p>
+      </div>
+    }
+  }
+</main>

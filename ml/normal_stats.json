@@ -1,0 +1,26 @@
+{
+  "distinct_products": {
+    "min": 0.6931471805599453,
+    "max": 6.588926477533519
+  },
+  "basket_size": {
+    "min": 1.0,
+    "max": 70.25
+  },
+  "avg_days_since_prior_order_user": {
+    "min": 0.0,
+    "max": 30.0
+  },
+  "total_purchases": {
+    "min": 0.6931471805599453,
+    "max": 13.06593269870092
+  },
+  "avg_days_since_prior_order": {
+    "min": 0.0,
+    "max": 30.0
+  },
+  "distinct_products_median": 0.5425361009980929,
+  "reorder_tendency_median": 0.42857142857142855,
+  "basket_size_median": 0.11456077013989496,
+  "avg_days_since_prior_order_median": 0.4833333331722222
+}

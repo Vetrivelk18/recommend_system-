@@ -1,0 +1,80 @@
+<header class="bar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">▲</span>
+    <span class="name">Basket</span>
+  </div>
+
+  <div class="bar-right">
+    @if (userId !== null) {
+      <span class="who">user <span class="uid">{{ userId }}</span></span>
+    }
+    <app-theme-toggle />
+    <button class="ghost" routerLink="/cart">
+      Cart@if (cartCount() > 0) { <span class="count">{{ cartCount() }}</span> }
+    </button>
+    <button class="ghost" (click)="back()">Dashboard</button>
+  </div>
+</header>
+
+<main class="page">
+  <h2>Search</h2>
+  <p class="sub">
+    Semantic (text_emb) fused with keyword (name_tsv) via RRF - same query the
+    webhook job reuses 15 minutes later, no recompute.
+  </p>
+
+  <form class="search-form" (ngSubmit)="search()">
+    <input
+      type="search"
+      name="q"
+      placeholder="organic avocado, sparkling water, cheerios…"
+      [(ngModel)]="query"
+      [disabled]="loading()"
+      autocomplete="off"
+    />
+    <button type="submit" [disabled]="loading() || !query().trim()">
+      {{ loading() ? 'Searching…' : 'Search' }}
+    </button>
+  </form>
+
+  @if (userId === null) {
+    <p class="notice">
+      Not signed in - results will show, but nothing is stored for the webhook job
+      to reuse. <a routerLink="/login">Sign in</a> to test that part.
+    </p>
+  } @else if (stored()) {
+    <p class="notice ok">
+      Stored to last_search for user {{ userId }} - the webhook candidate pipeline
+      will read this without re-running RRF.
+    </p>
+  }
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  } @else if (results(); as r) {
+    @if (r.length) {
+      <ul class="grid">
+        @for (item of r; track item.productId) {
+          <li class="item">
+            <span class="badge" [style.background]="tint(item.product)">{{ item.product.charAt(0) }}</span>
+            <span class="nm">{{ item.product }}</span>
+            @if (userId !== null) {
+              <button class="add" (click)="add(item.productId)"
+                      [disabled]="adding() !== null"
+                      [class.done]="isAdded(item.productId)">
+                {{ isAdded(item.productId) ? 'Added' : 'Add' }}
+              </button>
+            } @else {
+              <span class="pid">#{{ item.productId }}</span>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="empty">
+        <p class="empty-title">No matches</p>
+        <p class="sub">Try a different word, or check the product spelling.</p>
+      </div>
+    }
+  }
+</main>
