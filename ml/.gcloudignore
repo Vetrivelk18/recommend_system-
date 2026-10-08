@@ -1,0 +1,8 @@
+# What "gcloud run deploy --source ml" uploads. Without this file gcloud sends the whole
+# folder - the virtualenv included, ~300 MB - to a storage bucket before building.
+# Same allow-list as .dockerignore, plus the Dockerfile the build needs.
+*
+!Dockerfile
+!.dockerignore
+!embed_service.py
+!requirements.txt

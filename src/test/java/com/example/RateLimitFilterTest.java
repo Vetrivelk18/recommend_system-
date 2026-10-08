@@ -215,11 +215,13 @@ class RateLimitFilterTest {
     }
 
     @Test
-    @DisplayName("X-Forwarded-For is used when trusted, taking the left-most hop")
+    @DisplayName("X-Forwarded-For is used when trusted, taking the entry the proxy appended")
     void forwardedHeaderUsedWhenTrusted() throws Exception {
         properties.setTrustForwardedHeader(true);
+        // The first entry is whatever the caller chose to send; only the last was written
+        // by the proxy.
         call("/api/search", null, "10.0.0.1", Map.of("X-Forwarded-For", "203.0.113.9, 70.41.3.18"));
-        assertThat(redis.keysSeen).containsExactly("rate-limit:search:ip:203.0.113.9");
+        assertThat(redis.keysSeen).containsExactly("rate-limit:search:ip:70.41.3.18");
     }
 
     @Test

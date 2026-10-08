@@ -74,8 +74,30 @@ public class SearchService {
         return pool.size() <= displayLimit ? pool : pool.subList(0, displayLimit);
     }
 
+    /**
+     * Embed, fuse, store. The embedding is the one external call on this path, and since
+     * the embed service moved off-box it is also the one that can disappear on its own -
+     * a free tier sleeps after idle and a cold start can outlast the read timeout.
+     *
+     * <p>So it degrades rather than fails. Every other external call in this project
+     * already does: Redis treats an error as a miss, the reranker falls back to candidate
+     * order. This was the exception - an embed failure propagated out as a 500 and the
+     * search box simply broke - which was tolerable only while both processes lived and
+     * died together.
+     */
     private List<CandidateRow> compute(String queryText) {
-        String vector = embedClient.embed(queryText);
+        String vector;
+        try {
+            vector = embedClient.embed(queryText);
+        } catch (Exception e) {
+            // Not cached: these results are deliberately worse than a fused search, and
+            // caching them would keep serving the degraded ranking for ten minutes after
+            // the embed service came back.
+            log.warn("embed failed for \"{}\" - falling back to lexical-only search: {}",
+                    queryText, e.toString());
+            return searchRepository.lexicalOnly(queryText, STORE_SIZE);
+        }
+
         List<CandidateRow> pool =
                 searchRepository.rrf(vector, queryText, CANDIDATES_PER_ARM, STORE_SIZE);
 

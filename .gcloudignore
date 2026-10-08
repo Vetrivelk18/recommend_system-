@@ -1,0 +1,19 @@
+# What "gcloud run deploy --source ." uploads for the Spring app. The build needs only the
+# Dockerfile, pom.xml and src/ - without this file gcloud would also send node_modules, the
+# ml virtualenv and target/ to a storage bucket.
+.git
+.gitignore
+.idea
+.claude
+.mvn
+mvnw
+mvnw.cmd
+target
+frontend
+ml
+schema
+dump.rdb
+*.md
+*.env
+.env
+onboarding.postman_collection.json

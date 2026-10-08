@@ -70,6 +70,28 @@ public interface SearchRepository extends JpaRepository<Product, Integer> {
                           @Param("limit") int limit);
 
     /**
+     * The lexical half of rrf() on its own, for when no embedding is available.
+     *
+     * <p>Used when the embed service cannot be reached - hosted separately on a free tier,
+     * it sleeps after idle and a cold start can outlast the read timeout. Full-text search
+     * still matches what the shopper typed, so "greek yogurt" still finds greek yogurt;
+     * what is lost is the semantic arm, which is what would have surfaced a near-synonym
+     * the words miss. Worse ranking, not a broken page.
+     *
+     * <p>Deliberately the same clauses as the lex CTE above - same tsquery, same in_stock
+     * filter, same ordering - so results are a subset of the fused ones rather than a
+     * differently-behaved search.
+     */
+    @Query(value = """
+            SELECT p.product_id AS productId, p.product AS product
+            FROM products p, plainto_tsquery('english', :q) tsq
+            WHERE p.name_tsv @@ tsq AND p.in_stock
+            ORDER BY ts_rank_cd(p.name_tsv, tsq) DESC, p.product_id
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<CandidateRow> lexicalOnly(@Param("q") String queryText, @Param("limit") int limit);
+
+    /**
      * Overwrites the user's stored search - "last search" is deliberately singular,
      * not a history. The webhook only ever needs the most recent one, and keeping a
      * history would need its own cleanup policy for no benefit here.

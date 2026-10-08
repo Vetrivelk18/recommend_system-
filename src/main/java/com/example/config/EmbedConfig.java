@@ -22,6 +22,7 @@ public class EmbedConfig {
     @Bean
     public RestClient embedRestClient(
             @Value("${embed.base-url}") String baseUrl,
+            @Value("${embed.api-key:}") String apiKey,
             @Value("${embed.connect-timeout:3s}") Duration connectTimeout,
             @Value("${embed.read-timeout:10s}") Duration readTimeout) {
 
@@ -29,9 +30,16 @@ public class EmbedConfig {
         factory.setConnectTimeout(connectTimeout);
         factory.setReadTimeout(readTimeout);
 
-        return RestClient.builder()
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl(baseUrl)
-                .requestFactory(factory)
-                .build();
+                .requestFactory(factory);
+
+        // Only sent when configured, so a local run against an unsecured service is
+        // unchanged. Once the service is hosted the header is what stops it being an
+        // embedding API anyone can use at your expense.
+        if (!apiKey.isBlank()) {
+            builder.defaultHeader("X-Embed-Key", apiKey);
+        }
+        return builder.build();
     }
 }

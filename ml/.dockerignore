@@ -1,0 +1,5 @@
+# Allow-list: the service is one script and its requirements. The training code, the
+# virtualenv and any model weights in this folder have no business in the image.
+*
+!embed_service.py
+!requirements.txt

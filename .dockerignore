@@ -1,0 +1,15 @@
+# The image is built from pom.xml and src/ only. Everything else is either rebuilt inside
+# the image, belongs to the other service, or must never be shipped.
+.git
+.idea
+.claude
+.mvn
+target
+frontend
+ml
+schema
+dump.rdb
+*.md
+*.env
+.env
+onboarding.postman_collection.json

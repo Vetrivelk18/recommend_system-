@@ -111,8 +111,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (properties.isTrustForwardedHeader()) {
             String forwarded = request.getHeader("X-Forwarded-For");
             if (forwarded != null && !forwarded.isBlank()) {
-                // Left-most entry is the original client; the rest are proxy hops.
-                return forwarded.split(",")[0].trim();
+                // Right-most entry, not left-most. A proxy appends the address it actually
+                // saw to whatever the caller sent, so the last entry is the only one the
+                // caller cannot write. Taking the first would let anyone slip the limit
+                // by sending a different X-Forwarded-For with each request.
+                String[] hops = forwarded.split(",");
+                return hops[hops.length - 1].trim();
             }
         }
         return request.getRemoteAddr();

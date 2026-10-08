@@ -15,7 +15,9 @@ is shared by every request; loading per-request would dominate the response time
 """
 
 import argparse
+import hmac
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from fastembed import TextEmbedding
@@ -25,8 +27,34 @@ EXPECTED_DIM = 384
 
 model = None  # set once in main(); every request reuses it
 
+# Shared secret the caller must present. Empty disables the check, which is right for a
+# laptop and wrong anywhere reachable: without it this is a free public embedding API that
+# anyone can point load at, on a free tier with a CPU quota.
+API_KEY = os.environ.get("EMBED_API_KEY", "")
+
 
 class Handler(BaseHTTPRequestHandler):
+    def _authorised(self):
+        """compare_digest, not ==, so a wrong key cannot be recovered by timing."""
+        if not API_KEY:
+            return True
+        return hmac.compare_digest(self.headers.get("X-Embed-Key", ""), API_KEY)
+
+    def do_GET(self):
+        """
+        Health check. Render polls the service over HTTP to decide whether a deploy came
+        up, and before this existed there was no do_GET at all - every probe got
+        "501 Unsupported method" and the deploy would be marked failed.
+
+        Deliberately unauthenticated and deliberately not loading anything: it answers
+        only once the model is in memory, because main() does not bind the socket until
+        the startup probe has passed.
+        """
+        if self.path in ("/health", "/"):
+            self._json(200, {"status": "ok", "model": MODEL_NAME, "dim": EXPECTED_DIM})
+        else:
+            self._json(404, {"error": "not found"})
+
     def _read_body(self):
         """
         Java's RestClient (SimpleClientHttpRequestFactory, i.e. HttpURLConnection)
@@ -51,6 +79,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path != "/embed":
             self._json(404, {"error": "not found"})
+            return
+
+        if not self._authorised():
+            self._json(401, {"error": "bad or missing X-Embed-Key"})
             return
 
         raw = self._read_body()
@@ -86,9 +118,13 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     global model
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[1])
-    parser.add_argument("--port", type=int, default=8001)
+    # Render (and most platforms) assign a port and inject it as $PORT; binding anything
+    # else means the service starts, passes nothing, and is marked unhealthy. The flag
+    # still wins when given, so local runs are unchanged.
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8001)))
     args = parser.parse_args()
 
+    print(f"auth: {'required' if API_KEY else 'DISABLED (no EMBED_API_KEY set)'}", flush=True)
     print(f"loading {MODEL_NAME}...", flush=True)
     model = TextEmbedding(model_name=MODEL_NAME)
 

@@ -1,0 +1,5 @@
+# Pinned to the version the local .venv runs, because the 384-d vectors already stored in
+# products.text_emb were produced by it. A fastembed upgrade that changed tokenisation or
+# pooling would silently shift query embeddings away from the stored ones, and search would
+# degrade with nothing failing.
+fastembed==0.7.4
