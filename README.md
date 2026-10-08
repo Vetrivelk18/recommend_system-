@@ -19,20 +19,9 @@ spell takes 10-15 seconds while the app starts.
 
 ## Architecture
 
-```
-Browser (Angular)
-      |
-      v
-Spring Boot  ---------------------------  one jar serves the API and the Angular build
-      |
-      |-- Supabase Postgres + pgvector    products, embeddings, users, carts, orders
-      |-- Upstash Redis                   search cache, recommendation cache, rate limits
-      |-- CloudAMQP RabbitMQ              background job that pre-warms recommendations
-      |-- Gemini API                      final rerank of recommendation candidates
-      `-- Embed service (Python)          query text -> 384-d vector (fastembed, BGE-small)
-```
+![Basket system architecture](architecture.jpg)
 
-Both the Spring app and the embed service run on Google Cloud Run, each capped at one
+One Spring Boot jar serves both the API and the Angular build. Both the Spring app and the embed service run on Google Cloud Run, each capped at one
 instance. Everything else is a managed free tier.
 
 ### Search flow
