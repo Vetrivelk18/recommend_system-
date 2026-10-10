@@ -24,6 +24,10 @@ spell takes 10-15 seconds while the app starts.
 One Spring Boot jar serves both the API and the Angular build. Both the Spring app and the embed service run on Google Cloud Run, each capped at one
 instance. Everything else is a managed free tier.
 
+The two-tower model and the search and recommendation pipeline built on it:
+
+![Basket two-tower model and search pipeline](two-tower-architecture.jpg)
+
 ### Search flow
 
 ```
